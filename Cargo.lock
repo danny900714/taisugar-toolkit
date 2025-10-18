@@ -3,5 +3,5 @@
 version = 4
 
 [[package]]
-name = "redweb"
+name = "tscred"
 version = "0.1.0"
