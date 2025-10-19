@@ -7,4 +7,10 @@ pub enum Error {
 
     #[error(transparent)]
     ReqwestError(#[from] reqwest::Error),
+
+    #[error(transparent)]
+    JiffError(#[from] jiff::Error),
+
+    #[error("date parse error: {0}")]
+    ParseDateError(String),
 }

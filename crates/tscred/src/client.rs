@@ -1,6 +1,10 @@
-use url::Url;
-use crate::{GetItemNeedsOptions, ItemNeeds, OperationCenter};
 use crate::error::Error;
+use crate::{GetItemNeedsOptions, ItemNeeds, OperationCenter};
+use url::Url;
+
+const GET_OPERATION_CENTERS_URL: &str =
+    "http://192.168.41.30/TSCRED/BulkPeriodSheet/CennoDropdownList";
+const GET_ITEM_NEEDS_URL: &str = "http://192.168.41.30/TSCRED/ItemNeedCount/GetItemNeedCount";
 
 pub struct Client {
     client: reqwest::Client,
@@ -22,7 +26,7 @@ impl Client {
     pub async fn get_operation_centers(&self) -> Result<Vec<OperationCenter>, Error> {
         Ok(self
             .client
-            .get("http://192.168.41.30/TSCRED/BulkPeriodSheet/CennoDropdownList")
+            .get(GET_OPERATION_CENTERS_URL)
             .send()
             .await?
             .error_for_status()?
@@ -34,7 +38,7 @@ impl Client {
         &self,
         options: GetItemNeedsOptions<'_>,
     ) -> Result<ItemNeeds, Error> {
-        let mut url = Url::parse("http://192.168.41.30/TSCRED/ItemNeedCount/GetItemNeedCount")?;
+        let mut url = Url::parse(GET_ITEM_NEEDS_URL)?;
         url.query_pairs_mut()
             .append_key_only("CLANA")
             .append_pair("CLANA2", options.operation_center_id)

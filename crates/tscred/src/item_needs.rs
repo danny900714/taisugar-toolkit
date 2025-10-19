@@ -1,5 +1,7 @@
+use crate::date::parse_date_from_roc_calendar;
 use jiff::civil::Date;
 use serde::Deserialize;
+use std::collections::HashMap;
 use std::fmt::Display;
 
 pub struct GetItemNeedsOptions<'a> {
@@ -50,11 +52,8 @@ enum Value {
     Number(u64),
 }
 
-#[derive(Debug, PartialEq)]
-pub struct Item {
-    pub id: String,
-    pub title: String,
-}
+const STATION_NAME_KEY: &str = "NAME";
+const ORDER_DATE_KEY: &str = "ORDNO";
 
 #[derive(Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
@@ -85,7 +84,7 @@ impl ItemNeeds {
             // Find the station vector with the given name
             .find(|station_need| {
                 station_need.iter().any(|kv| {
-                    kv.key == "NAME"
+                    kv.key == STATION_NAME_KEY
                         && match &kv.value {
                             Value::String(value) => value == station_name,
                             Value::Number(_) => false,
@@ -100,6 +99,64 @@ impl ItemNeeds {
             Value::String(_) => None,
             Value::Number(value) => Some(*value),
         }
+    }
+
+    pub fn iter(&self) -> Iter<'_> {
+        Iter {
+            target: self,
+            index: 0,
+        }
+    }
+}
+
+#[derive(Debug, PartialEq)]
+pub struct Item {
+    pub id: String,
+    pub title: String,
+}
+
+pub struct ItemNeed<'a> {
+    station_name: &'a str,
+    order_date: Date,
+    items_count: HashMap<&'a str, u64>,
+}
+
+pub struct Iter<'a> {
+    target: &'a ItemNeeds,
+    index: usize,
+}
+
+impl<'a> Iterator for Iter<'a> {
+    type Item = ItemNeed<'a>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        let raw_item_need = self.target.data.get(self.index)?;
+        self.index += 1;
+
+        let mut station_name = "";
+        let mut order_date = Date::default();
+        let mut items_count = HashMap::new();
+        for kv in raw_item_need.iter() {
+            match &kv.value {
+                Value::String(value) => match kv.key.as_str() {
+                    STATION_NAME_KEY => station_name = value,
+                    ORDER_DATE_KEY => {
+                        order_date = parse_date_from_roc_calendar(value)
+                            .expect("unable to parse date from roc calendar")
+                    }
+                    _ => {}
+                },
+                Value::Number(value) => {
+                    items_count.insert(kv.key.as_str(), *value);
+                }
+            }
+        }
+
+        Some(ItemNeed {
+            station_name,
+            order_date,
+            items_count,
+        })
     }
 }
 
@@ -178,5 +235,48 @@ mod tests {
                 }
             ]
         )
+    }
+
+    #[test]
+    fn test_items_need_iter() {
+        let item_needs = deserialize_item_needs();
+        let item_needs = item_needs.iter().collect::<Vec<_>>();
+        assert_eq!(item_needs.len(), 45);
+
+        let first_item_need = &item_needs[0];
+        assert_eq!(first_item_need.station_name, "成功嶺站");
+        assert_eq!(first_item_need.order_date, Date::new(2025, 9, 30).unwrap());
+        assert_eq!(first_item_need.items_count.len(), 13);
+        assert_eq!(first_item_need.items_count.get("A_G960"), Some(&0));
+        assert_eq!(first_item_need.items_count.get("A_G001"), Some(&0));
+        assert_eq!(first_item_need.items_count.get("A_G002"), Some(&60));
+        assert_eq!(first_item_need.items_count.get("A_G277"), Some(&0));
+        assert_eq!(first_item_need.items_count.get("A_G281"), Some(&0));
+        assert_eq!(first_item_need.items_count.get("A_G298"), Some(&0));
+        assert_eq!(first_item_need.items_count.get("A_G316"), Some(&0));
+        assert_eq!(first_item_need.items_count.get("A_G330"), Some(&5));
+        assert_eq!(first_item_need.items_count.get("A_G363"), Some(&0));
+        assert_eq!(first_item_need.items_count.get("A_GP01"), Some(&0));
+        assert_eq!(first_item_need.items_count.get("A_G411"), Some(&0));
+        assert_eq!(first_item_need.items_count.get("A_G412"), Some(&0));
+        assert_eq!(first_item_need.items_count.get("A_G432"), Some(&0));
+
+        let last_item_need = &item_needs[44];
+        assert_eq!(last_item_need.station_name, "嘉保站");
+        assert_eq!(last_item_need.order_date, Date::new(2025, 9, 20).unwrap());
+        assert_eq!(last_item_need.items_count.len(), 13);
+        assert_eq!(last_item_need.items_count.get("A_G960"), Some(&0));
+        assert_eq!(last_item_need.items_count.get("A_G001"), Some(&30));
+        assert_eq!(last_item_need.items_count.get("A_G002"), Some(&0));
+        assert_eq!(last_item_need.items_count.get("A_G277"), Some(&0));
+        assert_eq!(last_item_need.items_count.get("A_G281"), Some(&0));
+        assert_eq!(last_item_need.items_count.get("A_G298"), Some(&0));
+        assert_eq!(last_item_need.items_count.get("A_G316"), Some(&0));
+        assert_eq!(last_item_need.items_count.get("A_G330"), Some(&0));
+        assert_eq!(last_item_need.items_count.get("A_G363"), Some(&0));
+        assert_eq!(last_item_need.items_count.get("A_GP01"), Some(&0));
+        assert_eq!(last_item_need.items_count.get("A_G411"), Some(&0));
+        assert_eq!(last_item_need.items_count.get("A_G412"), Some(&0));
+        assert_eq!(last_item_need.items_count.get("A_G432"), Some(&0));
     }
 }
