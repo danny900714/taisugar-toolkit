@@ -77,30 +77,6 @@ impl ItemNeeds {
         items
     }
 
-    pub fn get_station_item_need_count(&self, station_name: &str, item_id: &str) -> Option<u64> {
-        match &self
-            .data
-            .iter()
-            // Find the station vector with the given name
-            .find(|station_need| {
-                station_need.iter().any(|kv| {
-                    kv.key == STATION_NAME_KEY
-                        && match &kv.value {
-                            Value::String(value) => value == station_name,
-                            Value::Number(_) => false,
-                        }
-                })
-            })?
-            .iter()
-            // Find the key-value pair with the given item id
-            .find(|kv| kv.key == item_id)?
-            .value
-        {
-            Value::String(_) => None,
-            Value::Number(value) => Some(*value),
-        }
-    }
-
     pub fn iter(&self) -> Iter<'_> {
         Iter {
             target: self,
