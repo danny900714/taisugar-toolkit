@@ -1183,6 +1183,7 @@ dependencies = [
  "jiff",
  "reqwest",
  "serde",
+ "serde_json",
  "thiserror",
  "url",
 ]

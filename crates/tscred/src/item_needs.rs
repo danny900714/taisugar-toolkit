@@ -1,6 +1,6 @@
-use std::fmt::Display;
 use jiff::civil::Date;
 use serde::Deserialize;
+use std::fmt::Display;
 
 pub struct GetItemNeedsOptions<'a> {
     pub operation_center_id: &'a str,
@@ -27,7 +27,7 @@ impl Display for DisplayMode {
     }
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 struct DynamicColumn {
     field: String,
     title: String,
@@ -36,26 +36,27 @@ struct DynamicColumn {
     width: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 #[serde(rename_all = "PascalCase")]
 struct DataKV {
     key: String,
     value: Value,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 #[serde(untagged)]
 enum Value {
     String(String),
     Number(u64),
 }
 
+#[derive(Debug, PartialEq)]
 pub struct Item {
     pub id: String,
     pub title: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Debug)]
 #[serde(rename_all = "camelCase")]
 pub struct ItemNeeds {
     dynamic_columns: Vec<DynamicColumn>,
@@ -99,5 +100,83 @@ impl ItemNeeds {
             Value::String(_) => None,
             Value::Number(value) => Some(*value),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn deserialize_item_needs() -> ItemNeeds {
+        let json = include_bytes!("../testdata/GetItemNeedCount.json");
+        serde_json::from_slice(json).expect("Failed to deserialize GetItemNeedCount.json")
+    }
+
+    #[test]
+    fn test_item_needs_deserialize() {
+        deserialize_item_needs();
+    }
+
+    #[test]
+    fn test_get_all_items() {
+        let item_needs = deserialize_item_needs();
+        let items = item_needs.get_all_items();
+        assert_eq!(
+            items,
+            vec![
+                Item {
+                    id: "A_G960".to_string(),
+                    title: "[民]台糖詩夢絲環保洗衣精".to_string(),
+                },
+                Item {
+                    id: "A_G001".to_string(),
+                    title: "60抽盒裝面紙".to_string(),
+                },
+                Item {
+                    id: "A_G002".to_string(),
+                    title: "台糖礦泉水/箱".to_string(),
+                },
+                Item {
+                    id: "A_G277".to_string(),
+                    title: "原味蜆精62cc".to_string(),
+                },
+                Item {
+                    id: "A_G281".to_string(),
+                    title: "寡醣乳酸菌(正常包)".to_string(),
+                },
+                Item {
+                    id: "A_G298".to_string(),
+                    title: "妙管家強效洗衣粉4.5KG".to_string(),
+                },
+                Item {
+                    id: "A_G316".to_string(),
+                    title: "泡舒洗潔精1000ml".to_string(),
+                },
+                Item {
+                    id: "A_G330".to_string(),
+                    title: "五月花110抽連續抽取式衛生紙".to_string(),
+                },
+                Item {
+                    id: "A_G363".to_string(),
+                    title: "妙管家抗菌洗衣精4000gm".to_string(),
+                },
+                Item {
+                    id: "A_GP01".to_string(),
+                    title: "洗手間環保大捲筒衛生紙".to_string(),
+                },
+                Item {
+                    id: "A_G411".to_string(),
+                    title: "妙管家-衣物柔軟精補充包2L".to_string(),
+                },
+                Item {
+                    id: "A_G412".to_string(),
+                    title: "妙管家-濃縮洗衣精補充包2L".to_string(),
+                },
+                Item {
+                    id: "A_G432".to_string(),
+                    title: "110抽盒裝面紙".to_string(),
+                }
+            ]
+        )
     }
 }
