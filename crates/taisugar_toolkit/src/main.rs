@@ -1,32 +1,14 @@
+mod view;
+
 use gpui::prelude::*;
 use gpui::{
-    Application, AsyncApp, Bounds, KeyBinding, TitlebarOptions, Window, WindowBounds,
-    WindowOptions, actions, div, px, size,
+    Application, AsyncApp, Bounds, KeyBinding, TitlebarOptions, WindowBounds, WindowOptions,
+    actions, px, size,
 };
-use gpui_component::button::{Button, ButtonVariants};
-use gpui_component::{Root, StyledExt};
+use gpui_component::Root;
+use view::ToolkitView;
 
 actions!(window, [Quit]);
-
-struct HelloWorld;
-
-impl Render for HelloWorld {
-    fn render(&mut self, _window: &mut Window, _cx: &mut Context<Self>) -> impl IntoElement {
-        div()
-            .v_flex()
-            .gap_2()
-            .size_full()
-            .items_center()
-            .justify_center()
-            .child("Hello, world!")
-            .child(
-                Button::new("ok")
-                    .primary()
-                    .label("Let's Go!")
-                    .on_click(|_, _, _| println!("clicked")),
-            )
-    }
-}
 
 fn main() {
     let application = Application::new();
@@ -35,7 +17,7 @@ fn main() {
         gpui_component::init(cx);
 
         // Configure window options
-        let bounds = Bounds::centered(None, size(px(500.), px(500.0)), cx);
+        let bounds = Bounds::centered(None, size(px(1280.), px(720.)), cx);
         let titlebar_options = TitlebarOptions {
             title: Some("台糖工具包".into()),
             ..Default::default()
@@ -48,8 +30,7 @@ fn main() {
 
         cx.spawn(async move |cx: &mut AsyncApp| {
             cx.open_window(window_options, |window, cx| {
-                let view = cx.new(|_| HelloWorld);
-                // This first level in the window should be a Root.
+                let view = cx.new(|_| ToolkitView::new());
                 cx.new(|cx| Root::new(view.into(), window, cx))
             })?;
 
