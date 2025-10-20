@@ -6,6 +6,8 @@ use gpui::{
 use gpui_component::button::{Button, ButtonVariants};
 use gpui_component::{Root, StyledExt};
 
+actions!(window, [Quit]);
+
 struct HelloWorld;
 
 impl Render for HelloWorld {
@@ -25,8 +27,6 @@ impl Render for HelloWorld {
             )
     }
 }
-
-actions!(window, [Quit]);
 
 fn main() {
     let application = Application::new();
@@ -57,11 +57,16 @@ fn main() {
         })
         .detach();
 
-        // Add actions
+        cx.bind_keys([
+            #[cfg(target_os = "macos")]
+            KeyBinding::new("cmd-q", Quit, None),
+            #[cfg(not(target_os = "macos"))]
+            KeyBinding::new("alt-f4", Quit, None),
+        ]);
+
         cx.on_action(|_: &Quit, cx| {
             cx.quit();
         });
-        cx.bind_keys([KeyBinding::new("cmd-q", Quit, None)]);
 
         cx.activate(true);
     });
