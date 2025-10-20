@@ -5932,6 +5932,7 @@ dependencies = [
 name = "taisugar_toolkit"
 version = "0.1.0"
 dependencies = [
+ "anyhow",
  "gpui",
  "gpui-component",
 ]

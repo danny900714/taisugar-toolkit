@@ -1,7 +1,7 @@
 use gpui::prelude::*;
 use gpui::{
-    Application, Bounds, KeyBinding, TitlebarOptions, Window, WindowBounds, WindowOptions, actions,
-    div, px, size,
+    Application, AsyncApp, Bounds, KeyBinding, TitlebarOptions, Window, WindowBounds,
+    WindowOptions, actions, div, px, size,
 };
 use gpui_component::button::{Button, ButtonVariants};
 use gpui_component::{Root, StyledExt};
@@ -40,20 +40,22 @@ fn main() {
             title: Some("台糖工具包".into()),
             ..Default::default()
         };
+        let window_options = WindowOptions {
+            window_bounds: Some(WindowBounds::Windowed(bounds)),
+            titlebar: Some(titlebar_options),
+            ..Default::default()
+        };
 
-        // Open a window
-        cx.open_window(
-            WindowOptions {
-                window_bounds: Some(WindowBounds::Windowed(bounds)),
-                titlebar: Some(titlebar_options),
-                ..Default::default()
-            },
-            |window, cx| {
+        cx.spawn(async move |cx: &mut AsyncApp| {
+            cx.open_window(window_options, |window, cx| {
                 let view = cx.new(|_| HelloWorld);
+                // This first level in the window should be a Root.
                 cx.new(|cx| Root::new(view.into(), window, cx))
-            },
-        )
-        .expect("Failed to open window");
+            })?;
+
+            Ok::<_, anyhow::Error>(())
+        })
+        .detach();
 
         // Add actions
         cx.on_action(|_: &Quit, cx| {
