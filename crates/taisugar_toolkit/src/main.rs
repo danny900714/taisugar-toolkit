@@ -8,7 +8,9 @@ use gpui::{
     actions, px, size,
 };
 use gpui_component::Root;
+use tscred::Client;
 use view::ToolkitView;
+use crate::purchase_order::PurchaseOrderView;
 
 actions!(window, [Quit]);
 
@@ -32,8 +34,9 @@ fn main() {
 
         cx.spawn(async move |cx: &mut AsyncApp| {
             cx.open_window(window_options, |window, cx| {
-                let view = cx.new(|_| ToolkitView::new());
-                cx.new(|cx| Root::new(view.into(), window, cx))
+                let purchase_order_view = cx.new(|_| PurchaseOrderView::new(Client::new()));
+                let toolkit_view = cx.new(|_| ToolkitView::new(purchase_order_view));
+                cx.new(|cx| Root::new(toolkit_view.into(), window, cx))
             })?;
 
             Ok::<_, anyhow::Error>(())

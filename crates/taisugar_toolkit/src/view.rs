@@ -1,26 +1,27 @@
 use crate::delivery_record::DeliveryRecordView;
 use crate::purchase_order::PurchaseOrderView;
 use gpui::prelude::*;
-use gpui::{ClickEvent, Window, div, relative};
+use gpui::{ClickEvent, Entity, Window, div, relative};
 use gpui_component::sidebar::{Sidebar, SidebarGroup, SidebarHeader, SidebarMenu, SidebarMenuItem};
 use gpui_component::{ActiveTheme, Side, h_flex, v_flex};
-use tscred::Client;
 
 pub struct ToolkitView {
     active_item: MenuItem,
+    purchase_order_view: Entity<PurchaseOrderView>,
 }
 
 impl ToolkitView {
-    pub fn new() -> Self {
+    pub fn new(purchase_order_view: Entity<PurchaseOrderView>) -> Self {
         ToolkitView {
             active_item: MenuItem::PurchaseOrderNotice,
+            purchase_order_view,
         }
     }
 
     fn render_content(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         v_flex()
             .when(self.active_item == MenuItem::PurchaseOrderNotice, |this| {
-                this.child(cx.new(|_| PurchaseOrderView::new(Client::new())))
+                this.child(self.purchase_order_view.clone())
             })
             .when(self.active_item == MenuItem::DeliveryRecordSheet, |this| {
                 this.child(cx.new(|_| DeliveryRecordView::new()))
