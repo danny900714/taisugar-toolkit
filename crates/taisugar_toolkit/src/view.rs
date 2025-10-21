@@ -1,3 +1,5 @@
+use crate::delivery_record::DeliveryRecordView;
+use crate::purchase_order::PurchaseOrderView;
 use gpui::prelude::*;
 use gpui::{ClickEvent, Window, div, relative};
 use gpui_component::sidebar::{Sidebar, SidebarGroup, SidebarHeader, SidebarMenu, SidebarMenuItem};
@@ -14,11 +16,14 @@ impl ToolkitView {
         }
     }
 
-    fn render_content(&mut self, _window: &mut Window, _cx: &mut Context<Self>) -> impl IntoElement {
-        v_flex().child(match self.active_item {
-            MenuItem::PurchaseOrderNotice => self.active_item.label(),
-            MenuItem::DeliveryRecordSheet => self.active_item.label(),
-        })
+    fn render_content(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
+        v_flex()
+            .when(self.active_item == MenuItem::PurchaseOrderNotice, |this| {
+                this.child(cx.new(|_| PurchaseOrderView::new()))
+            })
+            .when(self.active_item == MenuItem::DeliveryRecordSheet, |this| {
+                this.child(cx.new(|_| DeliveryRecordView::new()))
+            })
     }
 }
 
