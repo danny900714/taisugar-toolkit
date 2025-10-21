@@ -1,6 +1,6 @@
-mod view;
-mod purchase_order;
 mod delivery_record;
+mod purchase_order;
+mod view;
 
 use gpui::prelude::*;
 use gpui::{
@@ -8,9 +8,7 @@ use gpui::{
     actions, px, size,
 };
 use gpui_component::Root;
-use tscred::Client;
 use view::ToolkitView;
-use crate::purchase_order::PurchaseOrderView;
 
 actions!(window, [Quit]);
 
@@ -34,9 +32,7 @@ fn main() {
 
         cx.spawn(async move |cx: &mut AsyncApp| {
             cx.open_window(window_options, |window, cx| {
-                let purchase_order_view = cx.new(|_| PurchaseOrderView::new(Client::new()));
-                let toolkit_view = cx.new(|_| ToolkitView::new(purchase_order_view));
-                cx.new(|cx| Root::new(toolkit_view.into(), window, cx))
+                cx.new(|cx| Root::new(ToolkitView::view(window, cx).into(), window, cx))
             })?;
 
             Ok::<_, anyhow::Error>(())

@@ -1,7 +1,7 @@
 use crate::delivery_record::DeliveryRecordView;
 use crate::purchase_order::PurchaseOrderView;
 use gpui::prelude::*;
-use gpui::{ClickEvent, Entity, Window, div, relative};
+use gpui::{App, ClickEvent, Entity, Window, div, relative};
 use gpui_component::sidebar::{Sidebar, SidebarGroup, SidebarHeader, SidebarMenu, SidebarMenuItem};
 use gpui_component::{ActiveTheme, Side, h_flex, v_flex};
 
@@ -11,7 +11,13 @@ pub struct ToolkitView {
 }
 
 impl ToolkitView {
-    pub fn new(purchase_order_view: Entity<PurchaseOrderView>) -> Self {
+    pub fn view(window: &mut Window, cx: &mut App) -> Entity<Self> {
+        cx.new(|cx| Self::new(window, cx))
+    }
+
+    fn new(window: &mut Window, cx: &mut Context<Self>) -> Self {
+        let purchase_order_view = PurchaseOrderView::view(window, cx);
+
         ToolkitView {
             active_item: MenuItem::PurchaseOrderNotice,
             purchase_order_view,
