@@ -4,6 +4,7 @@ use gpui::prelude::*;
 use gpui::{ClickEvent, Window, div, relative};
 use gpui_component::sidebar::{Sidebar, SidebarGroup, SidebarHeader, SidebarMenu, SidebarMenuItem};
 use gpui_component::{ActiveTheme, Side, h_flex, v_flex};
+use tscred::Client;
 
 pub struct ToolkitView {
     active_item: MenuItem,
@@ -19,7 +20,7 @@ impl ToolkitView {
     fn render_content(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
         v_flex()
             .when(self.active_item == MenuItem::PurchaseOrderNotice, |this| {
-                this.child(cx.new(|_| PurchaseOrderView::new()))
+                this.child(cx.new(|_| PurchaseOrderView::new(Client::new())))
             })
             .when(self.active_item == MenuItem::DeliveryRecordSheet, |this| {
                 this.child(cx.new(|_| DeliveryRecordView::new()))
