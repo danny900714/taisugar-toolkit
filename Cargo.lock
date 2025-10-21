@@ -5933,6 +5933,7 @@ name = "taisugar_toolkit"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "chrono",
  "gpui",
  "gpui-component",
  "tscred",

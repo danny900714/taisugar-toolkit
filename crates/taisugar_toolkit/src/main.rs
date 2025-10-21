@@ -18,6 +18,9 @@ fn main() {
         // Initialize GPUI component
         gpui_component::init(cx);
 
+        // Set locale
+        gpui_component::set_locale("zh-HK");
+
         // Configure window options
         let bounds = Bounds::centered(None, size(px(1280.), px(720.)), cx);
         let titlebar_options = TitlebarOptions {
