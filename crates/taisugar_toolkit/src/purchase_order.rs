@@ -1,4 +1,4 @@
-use chrono::{Days, Local};
+use chrono::{Datelike, Days, Local};
 use gpui::prelude::*;
 use gpui::{App, Entity, Window, div};
 use gpui_component::button::{Button, ButtonVariants};
@@ -24,32 +24,38 @@ impl PurchaseOrderView {
     }
 
     fn new(window: &mut Window, cx: &mut Context<Self>) -> Self {
+        let now = Local::now().naive_local().date();
         let report_date_picker = cx.new(|cx| {
-            let end = Local::now().naive_local().date();
-            let start = end.checked_sub_days(Days::new(7)).unwrap();
+            let start = now.checked_sub_days(Days::new(7)).unwrap();
 
             // Disable the dates after today
             let mut state = DatePickerState::range(window, cx).disabled_matcher(Matcher::range(
-                Some(end.checked_add_days(Days::new(1)).unwrap()),
+                Some(now.checked_add_days(Days::new(1)).unwrap()),
                 None,
             ));
 
             // Set the default date range to the last 7 days
-            state.set_date((start, end), window, cx);
+            state.set_date((start, now), window, cx);
 
             state
         });
-
         let notification_date_picker = cx.new(|cx| {
             let mut state = DatePickerState::new(window, cx);
 
             // Set the default date to today
-            state.set_date(Local::now().naive_local().date(), window, cx);
+            state.set_date(now, window, cx);
 
             state
         });
 
-        let order_number_input = cx.new(|cx| InputState::new(window, cx));
+        let order_number_input = cx.new(|cx| {
+            let n_week_in_month = (now.day() - 1) / 7 + 1;
+            InputState::new(window, cx).default_value(format!(
+                "{}-{}",
+                now.month(),
+                n_week_in_month
+            ))
+        });
 
         PurchaseOrderView {
             active_tab: 0,
