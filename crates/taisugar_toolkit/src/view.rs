@@ -3,7 +3,7 @@ use crate::purchase_order::PurchaseOrderView;
 use gpui::prelude::*;
 use gpui::{App, ClickEvent, Entity, Window, div, relative};
 use gpui_component::sidebar::{Sidebar, SidebarGroup, SidebarHeader, SidebarMenu, SidebarMenuItem};
-use gpui_component::{ActiveTheme, Side, h_flex, v_flex};
+use gpui_component::{ActiveTheme, Root, Side, h_flex, v_flex};
 
 pub struct ToolkitView {
     active_item: MenuItem,
@@ -67,40 +67,44 @@ impl MenuItem {
 
 impl Render for ToolkitView {
     fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
-        h_flex()
-            .rounded(cx.theme().radius)
-            .border_1()
-            .border_color(cx.theme().border)
-            .h_full()
-            .child(
-                Sidebar::new(Side::Left)
-                    .header(
-                        SidebarHeader::new().w_full().child(
-                            v_flex()
-                                .gap_0()
-                                .text_sm()
-                                .flex_1()
-                                .line_height(relative(1.25))
-                                .overflow_hidden()
-                                .text_ellipsis()
-                                .child("台灣糖業股份有限公司")
-                                .child(div().child("油品事業部").text_xs()),
-                        ),
-                    )
-                    .child(SidebarGroup::new("贈品").child(SidebarMenu::new().children(
-                        MenuItem::all().iter().map(|item| {
-                            SidebarMenuItem::new(item.label())
-                                .active(item == &self.active_item)
-                                .on_click(cx.listener(item.handler()))
-                        }),
-                    ))),
-            )
-            .child(
-                v_flex()
-                    .size_full()
-                    .gap_4()
-                    .p_4()
-                    .child(self.render_content(window, cx)),
-            )
+        let notification_layer = Root::render_notification_layer(window, cx);
+
+        div().size_full().children(notification_layer).child(
+            h_flex()
+                .rounded(cx.theme().radius)
+                .border_1()
+                .border_color(cx.theme().border)
+                .h_full()
+                .child(
+                    Sidebar::new(Side::Left)
+                        .header(
+                            SidebarHeader::new().w_full().child(
+                                v_flex()
+                                    .gap_0()
+                                    .text_sm()
+                                    .flex_1()
+                                    .line_height(relative(1.25))
+                                    .overflow_hidden()
+                                    .text_ellipsis()
+                                    .child("台灣糖業股份有限公司")
+                                    .child(div().child("油品事業部").text_xs()),
+                            ),
+                        )
+                        .child(SidebarGroup::new("贈品").child(SidebarMenu::new().children(
+                            MenuItem::all().iter().map(|item| {
+                                SidebarMenuItem::new(item.label())
+                                    .active(item == &self.active_item)
+                                    .on_click(cx.listener(item.handler()))
+                            }),
+                        ))),
+                )
+                .child(
+                    v_flex()
+                        .size_full()
+                        .gap_4()
+                        .p_4()
+                        .child(self.render_content(window, cx)),
+                ),
+        )
     }
 }

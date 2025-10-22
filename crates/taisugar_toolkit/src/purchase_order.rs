@@ -70,7 +70,7 @@ impl PurchaseOrderView {
         }
     }
 
-    fn submit(&mut self, cx: &mut Context<Self>) {
+    fn submit(&mut self, _window: &mut Window, cx: &mut Context<Self>) {
         let report_date = self.report_date_picker.read(cx).date();
         let notification_date = self.notification_date_picker.read(cx).date();
         let order_number = self.order_number_input.read(cx).value();
@@ -85,21 +85,14 @@ impl PurchaseOrderView {
 
         let start_date: jiff::civil::Date;
         let end_date: jiff::civil::Date;
-        match report_date {
-            Date::Range(start, end) => {
-                start_date = start.unwrap().to_string().parse().unwrap();
-                end_date = end.unwrap().to_string().parse().unwrap();
-            }
-            Date::Single(date) => {
-                // TODO: Handle error
-                return;
-            }
+        if let Date::Range(start, end) = report_date {
+            start_date = start.unwrap().to_string().parse().unwrap();
+            end_date = end.unwrap().to_string().parse().unwrap();
         }
 
         let client = Arc::clone(&cx.http_client());
-        cx.spawn(|this: WeakEntity<Self>, cx: &mut AsyncApp| async move {
-
-        }).detach();
+        cx.spawn(|this: WeakEntity<Self>, cx: &mut AsyncApp| async move {})
+            .detach();
     }
 
     fn render_tab_content(&self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
@@ -134,9 +127,9 @@ impl PurchaseOrderView {
                             .primary()
                             .label("產生訂購單")
                             .loading(self.submit_button_loading)
-                            .on_click(cx.listener(|this, _, _, cx| {
+                            .on_click(cx.listener(|this, _, window, cx| {
                                 this.submit_button_loading = true;
-                                this.submit(cx);
+                                this.submit(window, cx);
                                 this.submit_button_loading = false;
                             })),
                     ),
