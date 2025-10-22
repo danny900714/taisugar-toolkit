@@ -5936,6 +5936,7 @@ dependencies = [
  "chrono",
  "gpui",
  "gpui-component",
+ "jiff",
  "tscred",
 ]
 
