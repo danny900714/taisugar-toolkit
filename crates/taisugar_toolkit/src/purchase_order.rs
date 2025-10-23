@@ -1,6 +1,7 @@
+use crate::http::HttpClient;
 use chrono::{Datelike, Days, Local};
 use gpui::prelude::*;
-use gpui::{App, AsyncApp, Entity, SharedString, WeakEntity, Window, div};
+use gpui::{App, Entity, SharedString, Window, div};
 use gpui_component::button::{Button, ButtonVariants};
 use gpui_component::calendar::{Date, Matcher};
 use gpui_component::date_picker::{DatePicker, DatePickerState};
@@ -9,7 +10,7 @@ use gpui_component::input::{InputState, TextInput};
 use gpui_component::tab::{Tab, TabBar};
 use gpui_component::{Sizable, v_flex};
 use std::sync::Arc;
-use tscred::Client;
+use tscred::{Client, DisplayMode, GetItemNeedsOptions};
 
 pub struct PurchaseOrderView {
     active_tab: usize,
@@ -59,6 +60,7 @@ impl PurchaseOrderView {
             ))
         });
 
+        let agent = cx.global::<HttpClient>().0.clone();
         PurchaseOrderView {
             active_tab: 0,
             report_date_picker,
@@ -66,7 +68,7 @@ impl PurchaseOrderView {
             order_number_input,
             order_number_description: String::new(),
             submit_button_loading: false,
-            tscred: Arc::new(Client::new()),
+            tscred: Arc::new(Client::new(agent)),
         }
     }
 
@@ -85,14 +87,30 @@ impl PurchaseOrderView {
 
         let start_date: jiff::civil::Date;
         let end_date: jiff::civil::Date;
-        if let Date::Range(start, end) = report_date {
-            start_date = start.unwrap().to_string().parse().unwrap();
-            end_date = end.unwrap().to_string().parse().unwrap();
+        match report_date {
+            Date::Range(start, end) => {
+                start_date = start.unwrap().to_string().parse().unwrap();
+                end_date = end.unwrap().to_string().parse().unwrap();
+            }
+            _ => return,
         }
 
-        let client = Arc::clone(&cx.http_client());
-        cx.spawn(|this: WeakEntity<Self>, cx: &mut AsyncApp| async move {})
-            .detach();
+        let tscred = self.tscred.clone();
+        cx.background_spawn(async move {
+            let item_needs = tscred.get_item_needs(GetItemNeedsOptions {
+                operation_center_id: "11",
+                start_date: &start_date,
+                end_date: &end_date,
+                display_mode: &DisplayMode::Details,
+                department_id: "2",
+            });
+
+            match item_needs {
+                Ok(item_needs) => println!("{:?}", item_needs),
+                Err(err) => println!("{}", err),
+            }
+        })
+        .detach();
     }
 
     fn render_tab_content(&self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {

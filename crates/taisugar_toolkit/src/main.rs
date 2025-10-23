@@ -1,13 +1,17 @@
 mod delivery_record;
+mod http;
 mod purchase_order;
 mod view;
 
+use crate::http::HttpClient;
 use gpui::prelude::*;
 use gpui::{
     Application, AsyncApp, Bounds, KeyBinding, TitlebarOptions, WindowBounds, WindowOptions,
     actions, px, size,
 };
 use gpui_component::Root;
+use std::time::Duration;
+use ureq::Agent;
 use view::ToolkitView;
 
 actions!(window, [Quit]);
@@ -20,6 +24,13 @@ fn main() {
 
         // Set locale
         gpui_component::set_locale("zh-HK");
+
+        // Set global states
+        let config = Agent::config_builder()
+            .user_agent("")
+            .timeout_global(Some(Duration::from_secs(5)))
+            .build();
+        cx.set_global(HttpClient(Agent::new_with_config(config)));
 
         // Configure window options
         let bounds = Bounds::centered(None, size(px(1280.), px(720.)), cx);

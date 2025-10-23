@@ -1,62 +1,41 @@
 use crate::error::Error;
 use crate::{GetItemNeedsOptions, ItemNeeds, OperationCenter};
-use url::Url;
+use ureq::Agent;
 
 const GET_OPERATION_CENTERS_URL: &str =
     "http://192.168.41.30/TSCRED/BulkPeriodSheet/CennoDropdownList";
 const GET_ITEM_NEEDS_URL: &str = "http://192.168.41.30/TSCRED/ItemNeedCount/GetItemNeedCount";
 
 pub struct Client {
-    client: reqwest::Client,
-}
-
-impl Default for Client {
-    fn default() -> Self {
-        Self::new()
-    }
+    agent: Agent,
 }
 
 impl Client {
-    pub fn new() -> Self {
-        Self {
-            client: reqwest::Client::new(),
-        }
+    pub fn new(agent: Agent) -> Self {
+        Self { agent }
     }
 
     pub async fn get_operation_centers(&self) -> Result<Vec<OperationCenter>, Error> {
         Ok(self
-            .client
+            .agent
             .get(GET_OPERATION_CENTERS_URL)
-            .send()
-            .await?
-            .error_for_status()?
-            .json()
-            .await?)
+            .call()?
+            .body_mut()
+            .read_json()?)
     }
 
-    pub async fn get_item_needs(
-        &self,
-        options: GetItemNeedsOptions<'_>,
-    ) -> Result<ItemNeeds, Error> {
-        let mut url = Url::parse(GET_ITEM_NEEDS_URL)?;
-        url.query_pairs_mut()
-            .append_key_only("CLANA")
-            .append_pair("CLANA2", options.operation_center_id)
-            .append_pair(
-                "CLANO",
-                &options.start_date.strftime("%Y/%m/%d").to_string(),
-            )
-            .append_pair("CLANO2", &options.end_date.strftime("%Y/%m/%d").to_string())
-            .append_pair("DSP_SEL", &options.display_mode.to_string())
-            .append_pair("HOST", options.department_id);
-
+    pub fn get_item_needs(&self, options: GetItemNeedsOptions<'_>) -> Result<ItemNeeds, Error> {
         Ok(self
-            .client
-            .get(url)
-            .send()
-            .await?
-            .error_for_status()?
-            .json::<ItemNeeds>()
-            .await?)
+            .agent
+            .get(GET_ITEM_NEEDS_URL)
+            .query("CLANA", "")
+            .query("CLANA2", options.operation_center_id)
+            .query("CLANO", options.start_date.strftime("%Y/%m/%d").to_string())
+            .query("CLANO2", options.end_date.strftime("%Y/%m/%d").to_string())
+            .query("DSP_SEL", options.display_mode.to_string())
+            .query("HOST", options.department_id)
+            .call()?
+            .body_mut()
+            .read_json()?)
     }
 }
