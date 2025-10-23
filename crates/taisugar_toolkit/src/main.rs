@@ -1,8 +1,10 @@
+mod assets;
 mod delivery_record;
 mod http;
 mod purchase_order;
 mod view;
 
+use crate::assets::Assets;
 use crate::http::HttpClient;
 use gpui::prelude::*;
 use gpui::{
@@ -17,7 +19,7 @@ use view::ToolkitView;
 actions!(window, [Quit]);
 
 fn main() {
-    let application = Application::new();
+    let application = Application::new().with_assets(Assets);
     application.run(|cx| {
         // Initialize GPUI component
         gpui_component::init(cx);
