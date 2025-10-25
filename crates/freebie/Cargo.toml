@@ -1,13 +1,13 @@
 [package]
-name = "tscred"
+name = "freebie"
 version = "0.1.0"
 edition = "2024"
 
 [dependencies]
 thiserror.workspace = true
 jiff.workspace = true
-serde = { version = "1.0.228", features = ["derive"] }
-ureq = { version = "3.1.2", features = ["json"] }
+tscred = { version = "0.1.0", path = "../tscred" }
+umya-spreadsheet = "2.3.3"
 
 [dev-dependencies]
 serde_json = "1.0.145"

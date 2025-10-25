@@ -92,9 +92,9 @@ pub struct Item {
 }
 
 pub struct ItemNeed<'a> {
-    station_name: &'a str,
-    order_date: Date,
-    items_count: HashMap<&'a str, u64>,
+    pub station_name: &'a str,
+    pub order_date: Date,
+    pub items_count: HashMap<&'a str, u64>,
 }
 
 pub struct Iter<'a> {
@@ -141,7 +141,7 @@ mod tests {
     use super::*;
 
     fn deserialize_item_needs() -> ItemNeeds {
-        let json = include_bytes!("../testdata/GetItemNeedCount.json");
+        let json = include_bytes!("../../../testdata/GetItemNeedCount.json");
         serde_json::from_slice(json).expect("Failed to deserialize GetItemNeedCount.json")
     }
 

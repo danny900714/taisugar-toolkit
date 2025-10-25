@@ -1,0 +1,614 @@
+{
+  "dynamicColumns": [
+    {
+      "field": "NEW_GASNO",
+      "title": "油站代號",
+      "width": "110px"
+    },
+    {
+      "field": "NAME",
+      "title": "油站名稱",
+      "width": "180px"
+    },
+    {
+      "field": "ORDNO",
+      "title": "需求日期",
+      "width": "140px"
+    },
+    {
+      "field": "A_G960",
+      "title": "[民]台糖詩夢絲環保洗衣精",
+      "width": "200px"
+    },
+    {
+      "field": "A_G001",
+      "title": "60抽盒裝面紙",
+      "width": "200px"
+    },
+    {
+      "field": "A_G002",
+      "title": "台糖礦泉水/箱",
+      "width": "200px"
+    },
+    {
+      "field": "A_G277",
+      "title": "原味蜆精62cc",
+      "width": "200px"
+    },
+    {
+      "field": "A_G281",
+      "title": "寡醣乳酸菌(正常包)",
+      "width": "200px"
+    },
+    {
+      "field": "A_G298",
+      "title": "妙管家強效洗衣粉4.5KG",
+      "width": "200px"
+    },
+    {
+      "field": "A_G316",
+      "title": "泡舒洗潔精1000ml",
+      "width": "200px"
+    },
+    {
+      "field": "A_G330",
+      "title": "五月花110抽連續抽取式衛生紙",
+      "width": "200px"
+    },
+    {
+      "field": "A_G363",
+      "title": "妙管家抗菌洗衣精4000gm",
+      "width": "200px"
+    },
+    {
+      "field": "A_GP01",
+      "title": "洗手間環保大捲筒衛生紙",
+      "width": "200px"
+    },
+    {
+      "field": "A_G411",
+      "title": "妙管家-衣物柔軟精補充包2L",
+      "width": "200px"
+    },
+    {
+      "field": "A_G412",
+      "title": "妙管家-濃縮洗衣精補充包2L",
+      "width": "200px"
+    },
+    {
+      "field": "A_G432",
+      "title": "110抽盒裝面紙",
+      "width": "200px"
+    }
+  ],
+  "data": [
+    [
+      {
+        "Key": "NEW_GASNO",
+        "Value": "1247"
+      },
+      {
+        "Key": "NAME",
+        "Value": "新進站"
+      },
+      {
+        "Key": "ORDNO",
+        "Value": "114-09-15"
+      },
+      {
+        "Key": "A_G960",
+        "Value": 0
+      },
+      {
+        "Key": "A_G001",
+        "Value": 990
+      },
+      {
+        "Key": "A_G002",
+        "Value": 0
+      },
+      {
+        "Key": "A_G277",
+        "Value": 0
+      },
+      {
+        "Key": "A_G281",
+        "Value": 0
+      },
+      {
+        "Key": "A_G298",
+        "Value": 0
+      },
+      {
+        "Key": "A_G316",
+        "Value": 0
+      },
+      {
+        "Key": "A_G330",
+        "Value": 0
+      },
+      {
+        "Key": "A_G363",
+        "Value": 0
+      },
+      {
+        "Key": "A_GP01",
+        "Value": 0
+      },
+      {
+        "Key": "A_G411",
+        "Value": 0
+      },
+      {
+        "Key": "A_G412",
+        "Value": 0
+      },
+      {
+        "Key": "A_G432",
+        "Value": 0
+      }
+    ],
+    [
+      {
+        "Key": "NEW_GASNO",
+        "Value": "1241"
+      },
+      {
+        "Key": "NAME",
+        "Value": "潭頂站"
+      },
+      {
+        "Key": "ORDNO",
+        "Value": "114-09-30"
+      },
+      {
+        "Key": "A_G960",
+        "Value": 0
+      },
+      {
+        "Key": "A_G001",
+        "Value": 20
+      },
+      {
+        "Key": "A_G002",
+        "Value": 60
+      },
+      {
+        "Key": "A_G277",
+        "Value": 0
+      },
+      {
+        "Key": "A_G281",
+        "Value": 0
+      },
+      {
+        "Key": "A_G298",
+        "Value": 0
+      },
+      {
+        "Key": "A_G316",
+        "Value": 0
+      },
+      {
+        "Key": "A_G330",
+        "Value": 5
+      },
+      {
+        "Key": "A_G363",
+        "Value": 0
+      },
+      {
+        "Key": "A_GP01",
+        "Value": 0
+      },
+      {
+        "Key": "A_G411",
+        "Value": 0
+      },
+      {
+        "Key": "A_G412",
+        "Value": 0
+      },
+      {
+        "Key": "A_G432",
+        "Value": 0
+      }
+    ],
+    [
+      {
+        "Key": "NEW_GASNO",
+        "Value": "1243"
+      },
+      {
+        "Key": "NAME",
+        "Value": "曾文站"
+      },
+      {
+        "Key": "ORDNO",
+        "Value": "114-09-19"
+      },
+      {
+        "Key": "A_G960",
+        "Value": 0
+      },
+      {
+        "Key": "A_G001",
+        "Value": 50
+      },
+      {
+        "Key": "A_G002",
+        "Value": 60
+      },
+      {
+        "Key": "A_G277",
+        "Value": 0
+      },
+      {
+        "Key": "A_G281",
+        "Value": 0
+      },
+      {
+        "Key": "A_G298",
+        "Value": 0
+      },
+      {
+        "Key": "A_G316",
+        "Value": 0
+      },
+      {
+        "Key": "A_G330",
+        "Value": 0
+      },
+      {
+        "Key": "A_G363",
+        "Value": 0
+      },
+      {
+        "Key": "A_GP01",
+        "Value": 0
+      },
+      {
+        "Key": "A_G411",
+        "Value": 0
+      },
+      {
+        "Key": "A_G412",
+        "Value": 0
+      },
+      {
+        "Key": "A_G432",
+        "Value": 30
+      }
+    ],
+    [
+      {
+        "Key": "NEW_GASNO",
+        "Value": "1145"
+      },
+      {
+        "Key": "NAME",
+        "Value": "文正站"
+      },
+      {
+        "Key": "ORDNO",
+        "Value": "114-09-01"
+      },
+      {
+        "Key": "A_G960",
+        "Value": 0
+      },
+      {
+        "Key": "A_G001",
+        "Value": 0
+      },
+      {
+        "Key": "A_G002",
+        "Value": 0
+      },
+      {
+        "Key": "A_G277",
+        "Value": 0
+      },
+      {
+        "Key": "A_G281",
+        "Value": 0
+      },
+      {
+        "Key": "A_G298",
+        "Value": 0
+      },
+      {
+        "Key": "A_G316",
+        "Value": 0
+      },
+      {
+        "Key": "A_G330",
+        "Value": 20
+      },
+      {
+        "Key": "A_G363",
+        "Value": 0
+      },
+      {
+        "Key": "A_GP01",
+        "Value": 0
+      },
+      {
+        "Key": "A_G411",
+        "Value": 0
+      },
+      {
+        "Key": "A_G412",
+        "Value": 0
+      },
+      {
+        "Key": "A_G432",
+        "Value": 0
+      }
+    ],
+    [
+      {
+        "Key": "NEW_GASNO",
+        "Value": "1256"
+      },
+      {
+        "Key": "NAME",
+        "Value": "加昌站"
+      },
+      {
+        "Key": "ORDNO",
+        "Value": "114-09-03"
+      },
+      {
+        "Key": "A_G960",
+        "Value": 15
+      },
+      {
+        "Key": "A_G001",
+        "Value": 50
+      },
+      {
+        "Key": "A_G002",
+        "Value": 60
+      },
+      {
+        "Key": "A_G277",
+        "Value": 0
+      },
+      {
+        "Key": "A_G281",
+        "Value": 0
+      },
+      {
+        "Key": "A_G298",
+        "Value": 0
+      },
+      {
+        "Key": "A_G316",
+        "Value": 3
+      },
+      {
+        "Key": "A_G330",
+        "Value": 0
+      },
+      {
+        "Key": "A_G363",
+        "Value": 0
+      },
+      {
+        "Key": "A_GP01",
+        "Value": 0
+      },
+      {
+        "Key": "A_G411",
+        "Value": 0
+      },
+      {
+        "Key": "A_G412",
+        "Value": 0
+      },
+      {
+        "Key": "A_G432",
+        "Value": 50
+      }
+    ],
+    [
+      {
+        "Key": "NEW_GASNO",
+        "Value": "1246"
+      },
+      {
+        "Key": "NAME",
+        "Value": "樹安站"
+      },
+      {
+        "Key": "ORDNO",
+        "Value": "114-09-07"
+      },
+      {
+        "Key": "A_G960",
+        "Value": 0
+      },
+      {
+        "Key": "A_G001",
+        "Value": 30
+      },
+      {
+        "Key": "A_G002",
+        "Value": 0
+      },
+      {
+        "Key": "A_G277",
+        "Value": 0
+      },
+      {
+        "Key": "A_G281",
+        "Value": 0
+      },
+      {
+        "Key": "A_G298",
+        "Value": 0
+      },
+      {
+        "Key": "A_G316",
+        "Value": 0
+      },
+      {
+        "Key": "A_G330",
+        "Value": 0
+      },
+      {
+        "Key": "A_G363",
+        "Value": 0
+      },
+      {
+        "Key": "A_GP01",
+        "Value": 0
+      },
+      {
+        "Key": "A_G411",
+        "Value": 0
+      },
+      {
+        "Key": "A_G412",
+        "Value": 0
+      },
+      {
+        "Key": "A_G432",
+        "Value": 30
+      }
+    ],
+    [
+      {
+        "Key": "NEW_GASNO",
+        "Value": "1257"
+      },
+      {
+        "Key": "NAME",
+        "Value": "民族二站"
+      },
+      {
+        "Key": "ORDNO",
+        "Value": "114-09-29"
+      },
+      {
+        "Key": "A_G960",
+        "Value": 0
+      },
+      {
+        "Key": "A_G001",
+        "Value": 0
+      },
+      {
+        "Key": "A_G002",
+        "Value": 0
+      },
+      {
+        "Key": "A_G277",
+        "Value": 0
+      },
+      {
+        "Key": "A_G281",
+        "Value": 0
+      },
+      {
+        "Key": "A_G298",
+        "Value": 0
+      },
+      {
+        "Key": "A_G316",
+        "Value": 0
+      },
+      {
+        "Key": "A_G330",
+        "Value": 0
+      },
+      {
+        "Key": "A_G363",
+        "Value": 0
+      },
+      {
+        "Key": "A_GP01",
+        "Value": 4
+      },
+      {
+        "Key": "A_G411",
+        "Value": 0
+      },
+      {
+        "Key": "A_G412",
+        "Value": 0
+      },
+      {
+        "Key": "A_G432",
+        "Value": 0
+      }
+    ],
+    [
+      {
+        "Key": "NEW_GASNO",
+        "Value": "1259"
+      },
+      {
+        "Key": "NAME",
+        "Value": "民族三站"
+      },
+      {
+        "Key": "ORDNO",
+        "Value": "114-09-30"
+      },
+      {
+        "Key": "A_G960",
+        "Value": 0
+      },
+      {
+        "Key": "A_G001",
+        "Value": 100
+      },
+      {
+        "Key": "A_G002",
+        "Value": 0
+      },
+      {
+        "Key": "A_G277",
+        "Value": 0
+      },
+      {
+        "Key": "A_G281",
+        "Value": 0
+      },
+      {
+        "Key": "A_G298",
+        "Value": 0
+      },
+      {
+        "Key": "A_G316",
+        "Value": 0
+      },
+      {
+        "Key": "A_G330",
+        "Value": 0
+      },
+      {
+        "Key": "A_G363",
+        "Value": 0
+      },
+      {
+        "Key": "A_GP01",
+        "Value": 0
+      },
+      {
+        "Key": "A_G411",
+        "Value": 0
+      },
+      {
+        "Key": "A_G412",
+        "Value": 0
+      },
+      {
+        "Key": "A_G432",
+        "Value": 30
+      }
+    ]
+  ]
+}

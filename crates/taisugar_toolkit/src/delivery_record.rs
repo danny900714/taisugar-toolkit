@@ -12,7 +12,7 @@ impl DeliveryRecordView {
 }
 
 impl Render for DeliveryRecordView {
-    fn render(&mut self, window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
+    fn render(&mut self, _window: &mut Window, _cx: &mut Context<Self>) -> impl IntoElement {
         ""
     }
 }
