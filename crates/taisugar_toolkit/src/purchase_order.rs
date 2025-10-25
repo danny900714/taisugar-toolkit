@@ -5,7 +5,7 @@ use chrono::{Datelike, Days, Local};
 use freebie::Freebie;
 use futures::future::try_join_all;
 use gpui::prelude::*;
-use gpui::{App, AsyncApp, Entity, SharedString, WeakEntity, Window, div};
+use gpui::{AnyWindowHandle, App, AsyncApp, Entity, SharedString, WeakEntity, Window, div};
 use gpui_component::button::{Button, ButtonVariants};
 use gpui_component::calendar::{Date, Matcher};
 use gpui_component::date_picker::{DatePicker, DatePickerState};
@@ -101,6 +101,22 @@ impl PurchaseOrderView {
         }
     }
 
+    fn push_error_notification_and_turnoff_button_loading(
+        this: WeakEntity<Self>,
+        message: String,
+        window_handle: AnyWindowHandle,
+        cx: &mut AsyncApp,
+    ) {
+        let _ = cx.update_window(window_handle, |_, window, cx| {
+            window.push_notification((NotificationType::Error, SharedString::from(message)), cx);
+        });
+
+        let _ = this.update(cx, |this, cx| {
+            this.submit_button_loading = false;
+            cx.notify();
+        });
+    }
+
     fn submit(&mut self, window: &mut Window, cx: &mut Context<Self>) {
         // Show the loading state of submit button
         self.submit_button_loading = true;
@@ -171,23 +187,12 @@ impl PurchaseOrderView {
             let operation_centers = match operation_centers {
                 Ok(operation_centers) => operation_centers,
                 Err(error) => {
-                    let _ = cx.update_window(window_handle, |_, window, cx| {
-                        window.push_notification(
-                            (
-                                NotificationType::Error,
-                                SharedString::from(format!(
-                                    "無法從紅網取得營運中心資料\n{}",
-                                    error
-                                )),
-                            ),
-                            cx,
-                        );
-                    });
-
-                    let _ = this.update(cx, |this, cx| {
-                        this.submit_button_loading = false;
-                        cx.notify();
-                    });
+                    Self::push_error_notification_and_turnoff_button_loading(
+                        this,
+                        format!("無法從紅網取得營運中心資料\n{}", error),
+                        window_handle,
+                        cx,
+                    );
                     return;
                 }
             };
@@ -209,21 +214,12 @@ impl PurchaseOrderView {
             let item_needs = match try_join_all(tasks).await {
                 Ok(item_needs) => item_needs,
                 Err(error) => {
-                    let _ = cx.update_window(window_handle, |_this, window, cx| {
-                        window.push_notification(
-                            Notification::new()
-                                .with_type(NotificationType::Error)
-                                .message(SharedString::from(format!(
-                                    "無法從紅網取得贈品需求資料\n{:?}",
-                                    error
-                                ))),
-                            cx,
-                        );
-                    });
-                    let _ = this.update(cx, |this, cx| {
-                        this.submit_button_loading = false;
-                        cx.notify();
-                    });
+                    Self::push_error_notification_and_turnoff_button_loading(
+                        this,
+                        format!("無法從紅網取得贈品需求資料\n{:?}", error),
+                        window_handle,
+                        cx,
+                    );
                     return;
                 }
             };
@@ -249,22 +245,12 @@ impl PurchaseOrderView {
             let spreadsheet = match spreadsheet_result {
                 Ok(spreadsheet) => spreadsheet,
                 Err(error) => {
-                    let _ = cx.update_window(window_handle, |_this, window, cx| {
-                        window.push_notification(
-                            Notification::new()
-                                .with_type(NotificationType::Error)
-                                .message(SharedString::from(format!(
-                                    "無法產生{}訂購單\n{:?}",
-                                    active_freebie_name, error
-                                ))),
-                            cx,
-                        );
-                    });
-
-                    let _ = this.update(cx, |this, cx| {
-                        this.submit_button_loading = false;
-                        cx.notify();
-                    });
+                    Self::push_error_notification_and_turnoff_button_loading(
+                        this,
+                        format!("無法產生{}訂購單\n{:?}", active_freebie_name, error),
+                        window_handle,
+                        cx,
+                    );
                     return;
                 }
             };
