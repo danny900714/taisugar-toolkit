@@ -2,6 +2,7 @@ use crate::assets::Assets;
 use crate::http::HttpClient;
 use chrono::{Datelike, Days, Local};
 use freebie::Freebie;
+use futures::future::try_join_all;
 use gpui::prelude::*;
 use gpui::{App, AsyncApp, Entity, SharedString, WeakEntity, Window, div};
 use gpui_component::button::{Button, ButtonVariants};
@@ -160,17 +161,49 @@ impl PurchaseOrderView {
         let notification_date = notification_date.to_string().parse().unwrap();
 
         cx.spawn(async move |this: WeakEntity<Self>, cx: &mut AsyncApp| {
-            let item_needs_result = cx
-                .background_spawn(async move {
-                    tscred.get_item_needs(GetItemNeedsOptions {
-                        operation_center_id: "11",
+            let moved_tscred = tscred.clone();
+
+            let operation_centers = cx
+                .background_spawn(async move { moved_tscred.get_operation_centers() })
+                .await;
+            let operation_centers = match operation_centers {
+                Ok(operation_centers) => operation_centers,
+                Err(error) => {
+                    let _ = cx.update_window(window_handle, |_, window, cx| {
+                        window.push_notification(
+                            (
+                                NotificationType::Error,
+                                SharedString::from(format!(
+                                    "無法從紅網取得營運中心資料\n{}",
+                                    error
+                                )),
+                            ),
+                            cx,
+                        );
+                    });
+
+                    let _ = this.update(cx, |this, cx| {
+                        this.submit_button_loading = false;
+                        cx.notify();
+                    });
+                    return;
+                }
+            };
+
+            let mut tasks = vec![];
+            for center in operation_centers {
+                let moved_tscred = tscred.clone();
+                tasks.push(cx.background_spawn(async move {
+                    moved_tscred.get_item_needs(GetItemNeedsOptions {
+                        operation_center_id: &center.id,
                         start_date: &start_date,
                         end_date: &end_date,
                         display_mode: &DisplayMode::Details,
                         department_id: "2",
                     })
-                })
-                .await;
+                }));
+            }
+            let item_needs_result = try_join_all(tasks).await;
 
             // Handle errors when retrieving item needs
             if item_needs_result.is_err() {
@@ -185,11 +218,10 @@ impl PurchaseOrderView {
                         cx,
                     );
                 });
-                this.update(cx, |this, cx| {
+                let _ = this.update(cx, |this, cx| {
                     this.submit_button_loading = false;
                     cx.notify();
-                })
-                .unwrap();
+                });
                 return;
             }
             let item_needs = item_needs_result.unwrap();

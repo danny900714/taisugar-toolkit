@@ -4,7 +4,6 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
-jiff.workspace = true
 anyhow = "1.0.100"
 chrono = "0.4.42"
 freebie = { version = "0.1.0", path = "../freebie" }
@@ -14,3 +13,4 @@ rust-embed = { version = "8.8.0", features = ["interpolate-folder-path"] }
 tscred = { version = "0.1.0", path = "../tscred" }
 umya-spreadsheet = "2.3.3"
 ureq = "3.1.2"
+futures = "0.3.31"

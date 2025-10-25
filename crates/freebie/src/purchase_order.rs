@@ -1,12 +1,12 @@
-use std::collections::HashMap;
-use umya_spreadsheet::Spreadsheet;
-use jiff::civil::Date;
-use tscred::ItemNeeds;
 use crate::{Error, Freebie};
+use jiff::civil::Date;
+use std::collections::HashMap;
+use tscred::ItemNeeds;
+use umya_spreadsheet::Spreadsheet;
 
 pub fn generate_purchase_order_report<R: AsRef<str>>(
     template: &Spreadsheet,
-    item_needs: &ItemNeeds,
+    item_needs_slice: &[ItemNeeds],
     freebie: &Freebie,
     notification_date: &Date,
     order_number: R,
@@ -38,7 +38,8 @@ pub fn generate_purchase_order_report<R: AsRef<str>>(
         .set_value(freebie.order_number_cell_value(order_number));
 
     // Get the freebie ID
-    let id = item_needs
+    let first_item_needs = item_needs_slice.first().ok_or(Error::ItemNeedsEmpty)?;
+    let id = first_item_needs
         .get_all_items()
         .into_iter()
         .find(|item| item.title == freebie.name())
@@ -52,13 +53,15 @@ pub fn generate_purchase_order_report<R: AsRef<str>>(
         .enumerate()
         .map(|(i, value)| (value.get_value(), i + 5))
         .collect::<HashMap<_, _>>();
-    for item_need in item_needs.iter() {
-        if let Some(count) = item_need.items_count.get(id.as_str())
-            && let Some(cord) = stations.get(item_need.station_name)
-        {
-            worksheet
-                .get_cell_mut(format!("C{}", cord))
-                .set_value_number(*count as f64);
+    for item_needs in item_needs_slice {
+        for item_need in item_needs.iter() {
+            if let Some(count) = item_need.items_count.get(id.as_str())
+                && let Some(cord) = stations.get(item_need.station_name)
+            {
+                worksheet
+                    .get_cell_mut(format!("C{}", cord))
+                    .set_value_number(*count as f64);
+            }
         }
     }
 
@@ -90,7 +93,7 @@ mod tests {
 
         let sheet = generate_purchase_order_report(
             &template,
-            &item_needs,
+            &[item_needs],
             &Freebie::Tissue60,
             &notification_date,
             order_number,
@@ -124,7 +127,7 @@ mod tests {
 
         let sheet = generate_purchase_order_report(
             &template,
-            &item_needs,
+            &[item_needs],
             &Freebie::Tissue110,
             &notification_date,
             order_number,
@@ -140,8 +143,8 @@ mod tests {
         assert_eq!(
             counts,
             vec![
-                0., 0., 30., 0., 0., 30., 0., 0., 0., 0., 0., 0., 0., 0., 0., 50., 0., 0., 30.,
-                0., 0.
+                0., 0., 30., 0., 0., 30., 0., 0., 0., 0., 0., 0., 0., 0., 0., 50., 0., 0., 30., 0.,
+                0.
             ]
         );
         assert_eq!(worksheet.get_value("E2"), "114/10/28");
@@ -158,12 +161,12 @@ mod tests {
 
         let sheet = generate_purchase_order_report(
             &template,
-            &item_needs,
+            &[item_needs],
             &Freebie::MineralWater,
             &notification_date,
             order_number,
         )
-            .unwrap();
+        .unwrap();
 
         let worksheet = sheet.get_sheet(&0).unwrap();
         let counts: Vec<f64> = worksheet
@@ -174,8 +177,8 @@ mod tests {
         assert_eq!(
             counts,
             vec![
-                60., 0., 60., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 60., 0., 0., 0.,
-                0., 0.
+                60., 0., 60., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 0., 60., 0., 0., 0., 0.,
+                0.
             ]
         );
         assert_eq!(worksheet.get_value("F3"), "114/10/14");
