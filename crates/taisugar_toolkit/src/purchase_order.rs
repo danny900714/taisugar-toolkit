@@ -93,6 +93,49 @@ impl PurchaseOrderView {
         }
     }
 
+    fn validate(&mut self, cx: &mut Context<Self>) -> bool {
+        let report_date = self.report_date_picker.read(cx).date();
+        let notification_date = self.notification_date_picker.read(cx).date();
+        let order_number = self.order_number_input.read(cx).value();
+
+        let mut is_valid = true;
+
+        // Validate report date
+        match report_date {
+            Date::Range(start, end) => {
+                if start.is_none() || end.is_none() {
+                    self.report_date_description = "請選擇統計日期區間".to_string();
+                    is_valid = false;
+                } else {
+                    self.report_date_description = String::new();
+                }
+            }
+            _ => {
+                is_valid = false;
+            }
+        }
+
+        // Validate notification date
+        if let Date::Single(notification_date) = notification_date
+            && notification_date.is_none()
+        {
+            self.notification_date_description = "請選擇通知日期".to_string();
+            is_valid = false;
+        } else {
+            self.notification_date_description = String::new();
+        }
+
+        // Validate order number
+        if order_number.is_empty() {
+            self.order_number_description = "請輸入訂單編號".to_string();
+            is_valid = false;
+        } else {
+            self.order_number_description = String::new();
+        }
+
+        is_valid
+    }
+
     fn get_template_path(freebie: &Freebie) -> &'static str {
         match freebie {
             Freebie::Tissue60 => "templates/60抽面紙每週訂購單.xlsx",
@@ -122,50 +165,15 @@ impl PurchaseOrderView {
         self.submit_button_loading = true;
         cx.notify();
 
-        let report_date = self.report_date_picker.read(cx).date();
-        let notification_date = self.notification_date_picker.read(cx).date();
-        let order_number = self.order_number_input.read(cx).value();
-
-        let mut has_validation_error = false;
-
-        // Validate report date
-        match report_date {
-            Date::Range(start, end) => {
-                if start.is_none() || end.is_none() {
-                    self.report_date_description = "請選擇統計日期區間".to_string();
-                    has_validation_error = true;
-                } else {
-                    self.report_date_description = String::new();
-                }
-            }
-            _ => {
-                has_validation_error = true;
-            }
-        }
-
-        // Validate notification date
-        if let Date::Single(notification_date) = notification_date
-            && notification_date.is_none()
-        {
-            self.notification_date_description = "請選擇通知日期".to_string();
-            has_validation_error = true;
-        } else {
-            self.notification_date_description = String::new();
-        }
-
-        // Validate order number
-        if order_number.is_empty() {
-            self.order_number_description = "請輸入訂單編號".to_string();
-            has_validation_error = true
-        } else {
-            self.order_number_description = String::new();
-        }
-
-        if has_validation_error {
+        if !self.validate(cx) {
             self.submit_button_loading = false;
             cx.notify();
             return;
         }
+
+        let report_date = self.report_date_picker.read(cx).date();
+        let notification_date = self.notification_date_picker.read(cx).date();
+        let order_number = self.order_number_input.read(cx).value();
 
         // Create variables for the async tasks
         let window_handle = window.window_handle();
