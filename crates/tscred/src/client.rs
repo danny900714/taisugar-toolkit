@@ -15,7 +15,7 @@ impl Client {
         Self { agent }
     }
 
-    pub async fn get_operation_centers(&self) -> Result<Vec<OperationCenter>, Error> {
+    pub fn get_operation_centers(&self) -> Result<Vec<OperationCenter>, Error> {
         Ok(self
             .agent
             .get(GET_OPERATION_CENTERS_URL)

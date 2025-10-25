@@ -21,7 +21,9 @@ use umya_spreadsheet::{reader, writer};
 pub struct PurchaseOrderView {
     active_tab: usize,
     report_date_picker: Entity<DatePickerState>,
+    report_date_description: String,
     notification_date_picker: Entity<DatePickerState>,
+    notification_date_description: String,
     order_number_input: Entity<InputState>,
     order_number_description: String,
     submit_button_loading: bool,
@@ -70,7 +72,9 @@ impl PurchaseOrderView {
         PurchaseOrderView {
             active_tab: 0,
             report_date_picker,
+            report_date_description: String::new(),
             notification_date_picker,
+            notification_date_description: String::new(),
             order_number_input,
             order_number_description: String::new(),
             submit_button_loading: false,
@@ -104,6 +108,42 @@ impl PurchaseOrderView {
         let notification_date = self.notification_date_picker.read(cx).date();
         let order_number = self.order_number_input.read(cx).value();
 
+        // Validate report date
+        let start_date: jiff::civil::Date;
+        let end_date: jiff::civil::Date;
+        match report_date {
+            Date::Range(start, end) => {
+                if start.is_none() || end.is_none() {
+                    self.report_date_description = "請選擇統計日期區間".to_string();
+                    self.submit_button_loading = false;
+                    cx.notify();
+                    return;
+                }
+
+                start_date = start.unwrap().to_string().parse().unwrap();
+                end_date = end.unwrap().to_string().parse().unwrap();
+
+                self.report_date_description = String::new();
+                cx.notify();
+            }
+            _ => {
+                self.submit_button_loading = false;
+                cx.notify();
+                return;
+            }
+        }
+
+        // Validate notification date
+        if let Date::Single(notification_date) = notification_date
+            && notification_date.is_none()
+        {
+            self.notification_date_description = "請選擇通知日期".to_string();
+            self.submit_button_loading = false;
+            cx.notify();
+            return;
+        }
+        self.notification_date_description = String::new();
+
         // Validate order number
         if order_number.is_empty() {
             self.order_number_description = "請輸入訂單編號".to_string();
@@ -112,21 +152,6 @@ impl PurchaseOrderView {
             return;
         } else {
             self.order_number_description = String::new();
-        }
-
-        // Validate report date
-        let start_date: jiff::civil::Date;
-        let end_date: jiff::civil::Date;
-        match report_date {
-            Date::Range(start, end) => {
-                start_date = start.unwrap().to_string().parse().unwrap();
-                end_date = end.unwrap().to_string().parse().unwrap();
-            }
-            _ => {
-                self.submit_button_loading = false;
-                cx.notify();
-                return;
-            }
         }
 
         // Create variables for the async tasks
@@ -242,12 +267,18 @@ impl PurchaseOrderView {
                     form_field()
                         .label("統計日期區間")
                         .required(true)
+                        .when(!self.report_date_description.is_empty(), |this| {
+                            this.description(SharedString::from(&self.report_date_description))
+                        })
                         .child(DatePicker::new(&self.report_date_picker)),
                 )
                 .child(
                     form_field()
                         .label("通知日期")
                         .required(true)
+                        .when(!self.notification_date_description.is_empty(), |this| {
+                            this.description(SharedString::from(&self.notification_date_description))
+                        })
                         .child(DatePicker::new(&self.notification_date_picker).number_of_months(1)),
                 )
                 .child(
