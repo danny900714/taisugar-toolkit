@@ -108,28 +108,20 @@ impl PurchaseOrderView {
         let notification_date = self.notification_date_picker.read(cx).date();
         let order_number = self.order_number_input.read(cx).value();
 
+        let mut has_validation_error = false;
+
         // Validate report date
-        let start_date: jiff::civil::Date;
-        let end_date: jiff::civil::Date;
         match report_date {
             Date::Range(start, end) => {
                 if start.is_none() || end.is_none() {
                     self.report_date_description = "請選擇統計日期區間".to_string();
-                    self.submit_button_loading = false;
-                    cx.notify();
-                    return;
+                    has_validation_error = true;
+                } else {
+                    self.report_date_description = String::new();
                 }
-
-                start_date = start.unwrap().to_string().parse().unwrap();
-                end_date = end.unwrap().to_string().parse().unwrap();
-
-                self.report_date_description = String::new();
-                cx.notify();
             }
             _ => {
-                self.submit_button_loading = false;
-                cx.notify();
-                return;
+                has_validation_error = true;
             }
         }
 
@@ -138,25 +130,30 @@ impl PurchaseOrderView {
             && notification_date.is_none()
         {
             self.notification_date_description = "請選擇通知日期".to_string();
-            self.submit_button_loading = false;
-            cx.notify();
-            return;
+            has_validation_error = true;
+        } else {
+            self.notification_date_description = String::new();
         }
-        self.notification_date_description = String::new();
 
         // Validate order number
         if order_number.is_empty() {
             self.order_number_description = "請輸入訂單編號".to_string();
+            has_validation_error = true
+        } else {
+            self.order_number_description = String::new();
+        }
+
+        if has_validation_error {
             self.submit_button_loading = false;
             cx.notify();
             return;
-        } else {
-            self.order_number_description = String::new();
         }
 
         // Create variables for the async tasks
         let window_handle = window.window_handle();
         let tscred = self.tscred.clone();
+        let start_date = report_date.start().unwrap().to_string().parse().unwrap();
+        let end_date = report_date.end().unwrap().to_string().parse().unwrap();
         let active_freebie = self.get_active_freebie().unwrap();
         let active_freebie_name = active_freebie.name();
         let template_path = Self::get_template_path(&active_freebie);
@@ -277,7 +274,9 @@ impl PurchaseOrderView {
                         .label("通知日期")
                         .required(true)
                         .when(!self.notification_date_description.is_empty(), |this| {
-                            this.description(SharedString::from(&self.notification_date_description))
+                            this.description(SharedString::from(
+                                &self.notification_date_description,
+                            ))
                         })
                         .child(DatePicker::new(&self.notification_date_picker).number_of_months(1)),
                 )
