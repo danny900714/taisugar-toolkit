@@ -1,5 +1,6 @@
 use crate::assets::Assets;
 use crate::http::HttpClient;
+use anyhow::anyhow;
 use chrono::{Datelike, Days, Local};
 use freebie::Freebie;
 use futures::future::try_join_all;
@@ -163,6 +164,7 @@ impl PurchaseOrderView {
         cx.spawn(async move |this: WeakEntity<Self>, cx: &mut AsyncApp| {
             let moved_tscred = tscred.clone();
 
+            // Get all operation centers from tscred
             let operation_centers = cx
                 .background_spawn(async move { moved_tscred.get_operation_centers() })
                 .await;
@@ -190,6 +192,7 @@ impl PurchaseOrderView {
                 }
             };
 
+            // Get the item needs for each operation center
             let mut tasks = vec![];
             for center in operation_centers {
                 let moved_tscred = tscred.clone();
@@ -203,35 +206,36 @@ impl PurchaseOrderView {
                     })
                 }));
             }
-            let item_needs_result = try_join_all(tasks).await;
-
-            // Handle errors when retrieving item needs
-            if item_needs_result.is_err() {
-                let _ = cx.update_window(window_handle, |_this, window, cx| {
-                    window.push_notification(
-                        Notification::new()
-                            .with_type(NotificationType::Error)
-                            .message(SharedString::from(format!(
-                                "無法從紅網取得贈品需求資料\n{:?}",
-                                item_needs_result.err().unwrap()
-                            ))),
-                        cx,
-                    );
-                });
-                let _ = this.update(cx, |this, cx| {
-                    this.submit_button_loading = false;
-                    cx.notify();
-                });
-                return;
-            }
-            let item_needs = item_needs_result.unwrap();
+            let item_needs = match try_join_all(tasks).await {
+                Ok(item_needs) => item_needs,
+                Err(error) => {
+                    let _ = cx.update_window(window_handle, |_this, window, cx| {
+                        window.push_notification(
+                            Notification::new()
+                                .with_type(NotificationType::Error)
+                                .message(SharedString::from(format!(
+                                    "無法從紅網取得贈品需求資料\n{:?}",
+                                    error
+                                ))),
+                            cx,
+                        );
+                    });
+                    let _ = this.update(cx, |this, cx| {
+                        this.submit_button_loading = false;
+                        cx.notify();
+                    });
+                    return;
+                }
+            };
 
             // Generate the purchase order report
-            let spreadsheet = cx
+            let spreadsheet_result = cx
                 .background_spawn(async move {
-                    let template_file = Assets::get(template_path).unwrap();
-                    let template =
-                        reader::xlsx::read_reader(Cursor::new(template_file.data), true).unwrap();
+                    let template_file =
+                        Assets::get(template_path).ok_or(anyhow!("Failed to get template file"))?;
+                    let template = reader::xlsx::read_reader(Cursor::new(template_file.data), true)
+                        .map_err(|error| anyhow!("Failed to read template: {}", error))?;
+
                     freebie::generate_purchase_order_report(
                         &template,
                         &item_needs,
@@ -239,14 +243,39 @@ impl PurchaseOrderView {
                         &notification_date,
                         &order_number,
                     )
-                    .unwrap()
+                    .map_err(|error| anyhow!("Failed to generate purchase order report: {}", error))
                 })
                 .await;
+            let spreadsheet = match spreadsheet_result {
+                Ok(spreadsheet) => spreadsheet,
+                Err(error) => {
+                    let _ = cx.update_window(window_handle, |_this, window, cx| {
+                        window.push_notification(
+                            Notification::new()
+                                .with_type(NotificationType::Error)
+                                .message(SharedString::from(format!(
+                                    "無法產生{}訂購單\n{:?}",
+                                    active_freebie_name, error
+                                ))),
+                            cx,
+                        );
+                    });
+
+                    let _ = this.update(cx, |this, cx| {
+                        this.submit_button_loading = false;
+                        cx.notify();
+                    });
+                    return;
+                }
+            };
 
             // Retrieve the path to save the report
             let paths_receiver = cx
                 .update(|cx| {
-                    cx.prompt_for_new_path(env::home_dir().unwrap().as_path(), Some("活頁簿.xlsx"))
+                    cx.prompt_for_new_path(
+                        env::home_dir().unwrap_or_default().as_path(),
+                        Some("活頁簿.xlsx"),
+                    )
                 })
                 .unwrap();
             let path_buf_option = cx.background_spawn(paths_receiver).await.unwrap().unwrap();
@@ -279,11 +308,10 @@ impl PurchaseOrderView {
             }
 
             // Reset the submit button loading state
-            this.update(cx, |this, cx| {
+            let _ = this.update(cx, |this, cx| {
                 this.submit_button_loading = false;
                 cx.notify();
-            })
-            .unwrap();
+            });
         })
         .detach();
     }
