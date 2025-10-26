@@ -1,6 +1,10 @@
+#[cfg(target_os = "windows")]
 const LANG_CHINESE_TRADITIONAL: u16 = 0x7c04;
+
+#[cfg(target_os = "windows")]
 const SUBLANG_CHINESE_TRADITIONAL: u16 = 0x01;
 
+#[cfg(target_os = "windows")]
 fn make_lang_id(lang: u16, sublang: u16) -> u16 {
     (sublang << 10) | lang
 }
