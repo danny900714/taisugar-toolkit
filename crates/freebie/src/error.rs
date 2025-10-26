@@ -7,7 +7,7 @@ pub enum Error {
 
     #[error("unable to find freebie in item needs")]
     FreebieNotFound,
-    
+
     #[error("provided item needs are empty")]
     ItemNeedsEmpty,
 }
