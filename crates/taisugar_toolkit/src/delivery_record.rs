@@ -1,13 +1,11 @@
-use gpui::prelude::*;
 use gpui::Window;
+use gpui::prelude::*;
 
-pub struct DeliveryRecordView {
-}
+pub struct DeliveryRecordView {}
 
 impl DeliveryRecordView {
     pub fn new() -> Self {
-        DeliveryRecordView {
-        }
+        DeliveryRecordView {}
     }
 }
 
