@@ -1,0 +1,53 @@
+name: Continuous Integration and Deployment
+on:
+  push:
+  pull_request:
+  release:
+    types: [ published ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+    strategy: &strategy
+      matrix:
+        os: [ windows, macos ]
+
+    runs-on: &runs-on ${{ matrix.os }}-latest
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Cache
+        uses: actions/cache@v4
+        with: &cache-inputs
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: Build
+        run: cargo build --verbose
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v5
+        with:
+          name: taisugar-toolkit-${{ runner.os }}
+          path: target/debug/taisugar_toolkit
+
+  test:
+    strategy: *strategy
+
+    runs-on: *runs-on
+
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Cache
+        uses: actions/cache@v4
+        with: *cache-inputs
+
+      - name: Run tests
+        run: cargo test --verbose
