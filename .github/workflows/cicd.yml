@@ -85,7 +85,7 @@ jobs:
       contents: write
 
     env:
-      RELEASE_ASSET: 台糖工具包-${{ github.event.release.name }}-windows-x64.exe
+      RELEASE_ASSET: 台糖工具包-${{ github.event.release.name }}.exe
 
     steps:
       - name: Download build artifacts

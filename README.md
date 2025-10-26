@@ -8,6 +8,11 @@
 
 - **報表生成**：自動生成各種贈品（如面紙和瓶裝水）的每週訂貨通知單。
 
+## 安裝
+
+請前往[最新的發行版本頁面](https://github.com/danny900714/taisugar-toolkit/releases/latest)，
+在 Assets 底下找到「台糖工具包-{版本號}.exe」，下載該檔案並執行便可開始使用。
+
 ## 貢獻
 
 歡迎貢獻！請遵循標準的 GitHub 工作流程：
