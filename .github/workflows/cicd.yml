@@ -52,20 +52,18 @@ jobs:
     permissions:
       contents: write
 
+    env:
+      RELEASE_ASSET: 台糖工具包-${{ github.event.release.name }}-windows-x64.exe
+
     steps:
       - name: Download build artifacts
         uses: actions/download-artifact@v5
         with:
           name: taisugar-toolkit
           path: target/release
-      - name: Prepare release assets name
-        env:
-          OS: ${{ runner.os }}
-          ARCH: ${{ runner.arch }}
-        run: echo "OS=${$OS@L}" >> $GITHUB_ENV && echo "ARCH=${$ARCH@L}" >> $GITHUB_ENV
       - name: Rename release assets
-        run: mv target/release/taisugar_toolkit.exe "target/release/台糖工具包-${{ github.event.release.name }}-${OS}-${ARCH}.exe"
+        run: mv target/release/taisugar_toolkit.exe target/release/${{ env.RELEASE_ASSET }}
       - name: Upload release assets
         uses: softprops/action-gh-release@v2
         with:
-          files: target/release/台糖工具包-*.exe
+          files: target/release/${{ env.RELEASE_ASSET }}
