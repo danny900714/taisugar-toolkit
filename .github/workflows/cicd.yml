@@ -15,7 +15,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v5
-
       - name: Cache
         uses: actions/cache@v4
         with: &cache-inputs
@@ -24,10 +23,8 @@ jobs:
             ~/.cargo/git
             target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
-
       - name: Build
         run: cargo build --release
-
       - name: Upload artifact
         uses: actions/upload-artifact@v5
         with:
@@ -40,10 +37,35 @@ jobs:
 
     steps:
       - uses: actions/checkout@v5
-
       - name: Cache
         uses: actions/cache@v4
         with: *cache-inputs
-
       - name: Run tests
         run: cargo test
+
+  release:
+    name: Release
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release' && github.event.action == 'published'
+    needs: [ build, test ]
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v5
+        with:
+          name: taisugar-toolkit
+          path: target/release
+      - name: Prepare release assets name
+        env:
+          OS: ${{ runner.os }}
+          ARCH: ${{ runner.arch }}
+        run: echo "OS=${$OS@L}" >> $GITHUB_ENV && echo "ARCH=${$ARCH@L}" >> $GITHUB_ENV
+      - name: Rename release assets
+        run: mv target/release/taisugar_toolkit.exe "target/release/台糖工具包-${{ github.event.release.name }}-${OS}-${ARCH}.exe"
+      - name: Upload release assets
+        uses: softprops/action-gh-release@v2
+        with:
+          files: target/release/台糖工具包-*.exe
