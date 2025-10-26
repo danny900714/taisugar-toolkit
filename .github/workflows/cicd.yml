@@ -22,14 +22,40 @@ jobs:
             ~/.cargo/registry
             ~/.cargo/git
             target
-          key: ${{ runner.os }}-cargo-build-${{ hashFiles('**/Cargo.lock') }}
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
       - name: Build
-        run: cargo build --release
+        run: cargo build --locked --release
       - name: Upload artifact
         uses: actions/upload-artifact@v5
         with:
           name: taisugar-toolkit
           path: target/release/taisugar_toolkit.exe
+
+  lint:
+    name: Lint
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v5
+      - name: Cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+      - name: Run clippy
+        run: cargo clippy --locked --release
+
+  format:
+    name: Format
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v5
+      - name: Format check
+        run: cargo fmt --check --all
 
   test:
     name: Test
@@ -46,13 +72,13 @@ jobs:
             target
           key: ${{ runner.os }}-cargo-test-${{ hashFiles('**/Cargo.lock') }}
       - name: Run tests
-        run: cargo test
+        run: cargo test --locked
 
   release:
     name: Release
     runs-on: ubuntu-latest
     if: github.event_name == 'release' && github.event.action == 'published'
-    needs: [ build, test ]
+    needs: [ build, lint, format, test ]
 
     permissions:
       contents: write
