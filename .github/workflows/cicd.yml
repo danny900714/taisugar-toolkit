@@ -1,4 +1,4 @@
-name: Continuous Integration and Deployment
+name: CI/CD
 on:
   push:
   pull_request:
@@ -10,11 +10,8 @@ env:
 
 jobs:
   build:
-    strategy: &strategy
-      matrix:
-        os: [ windows, macos ]
-
-    runs-on: &runs-on ${{ matrix.os }}-latest
+    name: Build
+    runs-on: windows-latest
 
     steps:
       - uses: actions/checkout@v5
@@ -29,18 +26,17 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
       - name: Build
-        run: cargo build --verbose
+        run: cargo build --release
 
       - name: Upload artifact
         uses: actions/upload-artifact@v5
         with:
-          name: taisugar-toolkit-${{ runner.os }}
-          path: target/debug/taisugar_toolkit
+          name: taisugar-toolkit
+          path: target/release/taisugar_toolkit.exe
 
   test:
-    strategy: *strategy
-
-    runs-on: *runs-on
+    name: Test
+    runs-on: windows-latest
 
     steps:
       - uses: actions/checkout@v5
@@ -50,4 +46,4 @@ jobs:
         with: *cache-inputs
 
       - name: Run tests
-        run: cargo test --verbose
+        run: cargo test
