@@ -1,7 +1,7 @@
 use crate::delivery_record::DeliveryRecordView;
 use crate::purchase_order::PurchaseOrderView;
 use gpui::prelude::*;
-use gpui::{App, ClickEvent, Entity, Window, div, relative};
+use gpui::{App, ClickEvent, Entity, Window, div, img, relative};
 use gpui_component::sidebar::{Sidebar, SidebarGroup, SidebarHeader, SidebarMenu, SidebarMenuItem};
 use gpui_component::{ActiveTheme, Root, Side, h_flex, v_flex};
 
@@ -78,17 +78,20 @@ impl Render for ToolkitView {
                 .child(
                     Sidebar::new(Side::Left)
                         .header(
-                            SidebarHeader::new().w_full().child(
-                                v_flex()
-                                    .gap_0()
-                                    .text_sm()
-                                    .flex_1()
-                                    .line_height(relative(1.25))
-                                    .overflow_hidden()
-                                    .text_ellipsis()
-                                    .child("台灣糖業股份有限公司")
-                                    .child(div().child("油品事業部").text_xs()),
-                            ),
+                            SidebarHeader::new()
+                                .w_full()
+                                .child(img("images/taisugar.svg").size_8())
+                                .child(
+                                    v_flex()
+                                        .gap_0()
+                                        .text_sm()
+                                        .flex_1()
+                                        .line_height(relative(1.25))
+                                        .overflow_hidden()
+                                        .text_ellipsis()
+                                        .child("台灣糖業股份有限公司")
+                                        .child(div().child("油品事業部").text_xs()),
+                                ),
                         )
                         .child(SidebarGroup::new("贈品").child(SidebarMenu::new().children(
                             MenuItem::all().iter().map(|item| {
