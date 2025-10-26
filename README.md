@@ -11,7 +11,7 @@
 ## 安裝
 
 請前往[最新的發行版本頁面](https://github.com/danny900714/taisugar-toolkit/releases/latest)，
-在 Assets 底下找到「台糖工具包-{版本號}.exe」，下載該檔案並執行便可開始使用。
+在 Assets 底下找到「taisugar-toolkit-{版本號}.exe」，下載該檔案並執行便可開始使用。
 
 ## 貢獻
 
