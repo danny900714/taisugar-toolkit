@@ -8,6 +8,7 @@ use gpui_component::{ActiveTheme, Root, Side, h_flex, v_flex};
 pub struct ToolkitView {
     active_item: MenuItem,
     purchase_order_view: Entity<PurchaseOrderView>,
+    delivery_record_view: Entity<DeliveryRecordView>,
 }
 
 impl ToolkitView {
@@ -17,20 +18,26 @@ impl ToolkitView {
 
     fn new(window: &mut Window, cx: &mut Context<Self>) -> Self {
         let purchase_order_view = PurchaseOrderView::view(window, cx);
+        let delivery_record_view = DeliveryRecordView::view(window, cx);
 
         ToolkitView {
             active_item: MenuItem::PurchaseOrderNotice,
             purchase_order_view,
+            delivery_record_view,
         }
     }
 
-    fn render_content(&mut self, _window: &mut Window, cx: &mut Context<Self>) -> impl IntoElement {
+    fn render_content(
+        &mut self,
+        _window: &mut Window,
+        _cx: &mut Context<Self>,
+    ) -> impl IntoElement {
         v_flex()
             .when(self.active_item == MenuItem::PurchaseOrderNotice, |this| {
                 this.child(self.purchase_order_view.clone())
             })
             .when(self.active_item == MenuItem::DeliveryRecordSheet, |this| {
-                this.child(cx.new(|_| DeliveryRecordView::new()))
+                this.child(self.delivery_record_view.clone())
             })
     }
 }

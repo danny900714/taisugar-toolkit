@@ -1,5 +1,6 @@
 use umya_spreadsheet::helper::coordinate::CellCoordinates;
 
+#[derive(Copy, Clone)]
 pub enum Freebie {
     Tissue60,
     Tissue110,
@@ -7,6 +8,10 @@ pub enum Freebie {
 }
 
 impl Freebie {
+    pub fn all() -> [Freebie; 3] {
+        [Freebie::Tissue60, Freebie::Tissue110, Freebie::MineralWater]
+    }
+
     pub fn name(&self) -> &'static str {
         match self {
             Freebie::Tissue60 => "60抽盒裝面紙",

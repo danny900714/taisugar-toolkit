@@ -345,7 +345,7 @@ impl PurchaseOrderView {
                         .child(TextInput::new(&self.order_number_input)),
                 )
                 .child(
-                    form_field().no_label_indent().col_span(3).child(
+                    form_field().no_label_indent().col_span(2).child(
                         Button::new("generate-report")
                             .primary()
                             .label("產生訂購單")
@@ -364,7 +364,7 @@ impl Render for PurchaseOrderView {
             .gap_2()
             .child(div().text_2xl().child("訂貨通知單"))
             .child(
-                TabBar::new("test")
+                TabBar::new("purchase-order-tab-bar")
                     .underline()
                     .large()
                     .selected_index(self.active_tab)
