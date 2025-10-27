@@ -28,9 +28,9 @@ impl DeliveryRecordView {
         let now = Local::now().naive_local().date();
         let query_month_input = cx.new(|cx| {
             InputState::new(window, cx)
-                .validate(|value, _| {
-                    let value = value.parse::<u32>().unwrap_or_default();
-                    (1..=12).contains(&value)
+                .validate(|value, _| match value.parse::<u32>() {
+                    Ok(value) => (1..=12).contains(&value),
+                    Err(_) => false,
                 })
                 .default_value(SharedString::from(now.month().to_string()))
         });
@@ -63,7 +63,7 @@ impl DeliveryRecordView {
             self.query_month_description = String::new();
         }
 
-        if self.selected_tab_index == 2
+        if self.is_mineral_water_selected()
             && let Date::Single(report_date) = report_date
             && report_date.is_none()
         {
@@ -100,13 +100,13 @@ impl DeliveryRecordView {
                     form_field()
                         .label("統計月份")
                         .required(true)
-                        .when(self.selected_tab_index != 2, |this| this.col_span(2))
+                        .when(!self.is_mineral_water_selected(), |this| this.col_span(2))
                         .when(!self.query_month_description.is_empty(), |this| {
                             this.description(SharedString::from(&self.query_month_description))
                         })
                         .child(TextInput::new(&self.query_month_input).suffix("月")),
                 )
-                .when(self.selected_tab_index == 2, |this| {
+                .when(self.is_mineral_water_selected(), |this| {
                     this.child(
                         form_field()
                             .label("報告日期")
@@ -127,6 +127,10 @@ impl DeliveryRecordView {
                     ),
                 ),
         )
+    }
+
+    fn is_mineral_water_selected(&self) -> bool {
+        self.selected_tab_index == 2
     }
 }
 
