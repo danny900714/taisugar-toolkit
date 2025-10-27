@@ -37,9 +37,12 @@ impl Client {
             .agent
             .post(PURCHASE_LIST_API_URL)
             .send_form([
-                ("_token", self.csrf_token.as_ref().ok_or(Error::CSRFTokenNotFound)?.clone()),
-                ("startday", start_date.strftime("%Y%m%d").to_string()),
-                ("endday", end_date.strftime("%Y%m%d").to_string()),
+                (
+                    "_token",
+                    self.csrf_token.as_ref().ok_or(Error::CSRFTokenNotFound)?,
+                ),
+                ("startday", &start_date.strftime("%Y%m%d").to_string()),
+                ("endday", &end_date.strftime("%Y%m%d").to_string()),
             ])?
             .body_mut()
             .read_json()?)
@@ -48,13 +51,12 @@ impl Client {
     fn refresh_login_status(&mut self) -> Result<bool, Error> {
         // Check whether "XSRF-TOKEN", and "laravel_session" cookies and csrf_token are set and not expired
         let is_cookie_expired;
-        let cookie_jar = self.agent.cookie_jar_lock();
         {
+            let cookie_jar = self.agent.cookie_jar_lock();
             let xsrf_token = cookie_jar.get(DOMAIN, "/", "XSRF-TOKEN");
             let laravel_session = cookie_jar.get(DOMAIN, "/", "laravel_session");
             is_cookie_expired = xsrf_token.is_none() || laravel_session.is_none();
         }
-        cookie_jar.release();
         if is_cookie_expired || self.csrf_token.is_none() {
             // Login expired, reset csrf_token and perform login again
             self.csrf_token = None;

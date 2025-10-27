@@ -63,26 +63,8 @@ pub struct PurchaseList {
 }
 
 impl PurchaseList {
-    pub fn iter(&self) -> Iter<'_> {
-        Iter {
-            data: &self.data,
-            index: 0,
-        }
-    }
-}
-
-pub struct Iter<'a> {
-    data: &'a [Purchase],
-    index: usize,
-}
-
-impl<'a> Iterator for Iter<'a> {
-    type Item = &'a Purchase;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        let purchase = self.data.get(self.index);
-        self.index += 1;
-        purchase
+    pub fn iter(&self) -> impl Iterator<Item = &Purchase> + '_ {
+        self.data.iter()
     }
 }
 
