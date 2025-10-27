@@ -345,7 +345,7 @@ impl PurchaseOrderView {
                         .child(TextInput::new(&self.order_number_input)),
                 )
                 .child(
-                    form_field().no_label_indent().col_span(3).child(
+                    form_field().no_label_indent().col_span(2).child(
                         Button::new("generate-report")
                             .primary()
                             .label("產生訂購單")
