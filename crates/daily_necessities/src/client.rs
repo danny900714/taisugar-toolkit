@@ -37,7 +37,7 @@ impl Client {
             .agent
             .post(PURCHASE_LIST_API_URL)
             .send_form([
-                ("_token", self.csrf_token.as_ref().unwrap().clone()),
+                ("_token", self.csrf_token.as_ref().ok_or(Error::CSRFTokenNotFound)?.clone()),
                 ("startday", start_date.strftime("%Y%m%d").to_string()),
                 ("endday", end_date.strftime("%Y%m%d").to_string()),
             ])?
