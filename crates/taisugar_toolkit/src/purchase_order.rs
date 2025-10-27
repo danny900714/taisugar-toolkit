@@ -364,7 +364,7 @@ impl Render for PurchaseOrderView {
             .gap_2()
             .child(div().text_2xl().child("訂貨通知單"))
             .child(
-                TabBar::new("test")
+                TabBar::new("purchase-order-tab-bar")
                     .underline()
                     .large()
                     .selected_index(self.active_tab)
