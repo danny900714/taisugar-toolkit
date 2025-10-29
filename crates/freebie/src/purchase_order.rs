@@ -38,12 +38,15 @@ pub fn generate_purchase_order_report<R: AsRef<str>>(
         .set_value(freebie.order_number_cell_value(order_number));
 
     // Get the freebie ID
-    let first_item_needs = item_needs_slice.first().ok_or(Error::ItemNeedsEmpty)?;
-    let id = first_item_needs
-        .get_all_items()
-        .into_iter()
-        .find(|item| item.title == freebie.name())
-        .map(|item| item.id)
+    let id = item_needs_slice
+        .iter()
+        .find_map(|item_needs| {
+            item_needs
+                .get_all_items()
+                .into_iter()
+                .find(|item| item.title == freebie.name())
+                .map(|item| item.id)
+        })
         .ok_or(Error::FreebieNotFound)?;
 
     // Set the item needs
